@@ -14,7 +14,7 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
     Custom dataset to solve car plates recognition task
     '''
 
-    def __init__(self, root, transforms, mode: str,
+    def __init__(self, root: str, transforms: transforms.Compose, mode: str,
                  train_size: int = 0.9) -> None:
         '''
         Args:
@@ -44,7 +44,7 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
         self.load_data(json_data[data_range[0]:data_range[1]])
         return
 
-    def load_data(self, json_data) -> None:
+    def load_data(self, json_data: dict) -> None:
         '''
         Load data from json with data markup
 
@@ -80,7 +80,7 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
             self.image_texts.append(texts)
             self.box_areas.append(areas)
 
-    def __getitem__(self, idx) -> Tuple[torch.Tensor, dict]:
+    def __getitem__(self, idx: int) -> Tuple[torch.Tensor, dict]:
         '''
         Get image from dataset
 
