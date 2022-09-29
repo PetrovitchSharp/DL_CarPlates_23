@@ -43,7 +43,7 @@ def recognize_car_plate(img_path: str, model: nn.Module,
     predictions = model([img])
     predictions = [detach_dict(pred) for pred in predictions]
 
-    boxes = get_boxes(predictions)
+    boxes = get_boxes(predictions, 0.9)
     plates_count = len(boxes)
 
     unnormalize_1 = transforms.Normalize(mean=[-0.485, -0.456, -0.406],
