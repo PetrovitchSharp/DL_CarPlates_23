@@ -70,7 +70,7 @@ for epoch in range(num_epochs):
 
     batch_losses = np.array(batch_losses)
     batch_losses = batch_losses[np.isfinite(batch_losses)]
-    print(f'Valid_loss: {np.mean(batch_losses)}')
+    print(f'Epoch: {epoch}, Valid_loss: {np.mean(batch_losses)}')
     lr_scheduler.step()
 
 save_model(model, 'fasterrcnn', '../models')
