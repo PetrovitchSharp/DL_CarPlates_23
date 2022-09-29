@@ -14,11 +14,13 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
     Custom dataset to solve car plates recognition task
     '''
 
-    def __init__(self, root, transforms, train_size=0.9) -> None:
+    def __init__(self, root, transforms, mode: str,
+                 train_size: int = 0.9) -> None:
         '''
         Args:
             root:       Path to directory with dataset
             transforms: Transforms to be done with images
+            mode:       Type of dataset
             train_size: Size of train part
         '''
         super(CarPlatesDatasetWithRectangularBoxes, self).__init__()
@@ -37,7 +39,7 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
         with open(plates_filename) as f:
             json_data = json.load(f)
         train_valid_border = int(len(json_data) * train_size) + 1
-        data_range = (0, train_valid_border) if split == 'train' \
+        data_range = (0, train_valid_border) if mode == 'train' \
             else (train_valid_border, len(json_data))
         self.load_data(json_data[data_range[0]:data_range[1]])
         return
@@ -114,13 +116,14 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
 
 
 def load_dataset(
-        path: str, transformations: transforms.Compose) -> CarPlatesDatasetWithRectangularBoxes:
+        path: str, transformations: transforms.Compose, mode: str) -> CarPlatesDatasetWithRectangularBoxes:
     '''
     Load images and create dataset containing them
 
     Args:
         path:               Path to directory with images
         transformations:    Transormations to be done with images
+        mode:               Type of dataset
 
     Returns:
         Custom dataset with images in it
