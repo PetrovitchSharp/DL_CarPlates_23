@@ -128,4 +128,4 @@ def load_dataset(
     Returns:
         Custom dataset with images in it
     '''
-    return CarPlatesDatasetWithRectangularBoxes(path, transformations)
+    return CarPlatesDatasetWithRectangularBoxes(path, transformations, mode)
