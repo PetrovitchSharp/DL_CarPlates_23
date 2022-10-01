@@ -1,8 +1,10 @@
 from pathlib import Path
+from typing import List
 
 import torch
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
+from torchvision import transforms
 
 
 def create_model() -> torch.nn.Module:
@@ -59,22 +61,47 @@ def load_model(path: str) -> torch.nn.Module:
     return model
 
 
-def collate_fn(batch):
-    return tuple(zip(*batch))
+def collate_fn(samples: List) -> tuple:
+    '''
+    Collate lists of samples into batches
+
+    Args:
+        samples: List of samples
+
+    Returns:
+        Batch
+    '''
+    return tuple(zip(*samples))
 
 
-def detach_dict(pred):
+def detach_dict(pred: dict) -> dict:
+    '''
+    Detach dict
+
+    Args:
+        Prediction of a model
+
+    Returns:
+        Detached dict
+    '''
     return {k: v.detach().cpu() for (k, v) in pred.items()}
 
 
-def load_image(img_path: str) -> torch.Tensor:
+def load_image(img_path: str, transformations: transforms.Compose) -> torch.Tensor:
     '''
     Load image from file
 
     Args:
-        img_path: Path to image
+        img_path:           Path to image
+        transformations:    Transformations to be done with image 
 
     Returns:
-        Loaded image as a tensor
+        Loaded image
     '''
-    pass
+    image = cv2.imread(img_path)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    if transformations is not None:
+        image = transforms(image)
+
+    return image

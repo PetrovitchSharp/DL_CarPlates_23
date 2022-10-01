@@ -8,6 +8,8 @@ import torch
 from torch.utils import data
 from torchvision import transforms
 
+from utils import load_image
+
 
 class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
     '''
@@ -98,11 +100,8 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
             target['image_id'] = self.image_ids[idx].clone()
             target['iscrowd'] = torch.Tensor([False] * num_boxes)
 
-        image = cv2.imread(str(self.image_names[idx]))
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-        if self.transforms is not None:
-            image = self.transforms(image)
+        image = load_image(str(self.image_names[idx]), self.transforms)
+        
         return image, target
 
     def __len__(self) -> int:
