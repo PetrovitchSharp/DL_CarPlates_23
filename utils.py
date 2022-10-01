@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import torch
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
@@ -32,7 +34,9 @@ def save_model(model: torch.nn.Module, model_name: str, path: str) -> None:
         model_name: Model name
         path:       Directory to save
     '''
-    with open(f'{path}/{model_name}', 'wb') as fp:
+    path = Path(path)
+    path.mkdir(exist_ok=True)
+    with open(path / model_name, 'wb') as fp:
         torch.save(model.state_dict(), fp)
 
 
