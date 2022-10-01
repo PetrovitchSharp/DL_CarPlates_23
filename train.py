@@ -9,7 +9,13 @@ from dataset import load_dataset
 from utils import collate_fn, create_model, save_model
 
 
-def make_parser():
+def make_parser() -> argparse.ArgumentParser:
+    '''
+    Make cli arguments parser
+
+    Returns:
+        CLI args parser
+    '''
     parser = argparse.ArgumentParser(
         description='Train carplate model'
         )
@@ -31,7 +37,11 @@ def make_parser():
     return parser
 
 
-def main():
+def main() -> None:
+    '''
+    Main function responsible for model training
+    '''
+    #region Arguments parsing
     parser = make_parser()
     args = parser.parse_args()
     print(args)
@@ -40,10 +50,14 @@ def main():
     num_epochs = args.num_epochs
     batch_size = args.batch_size
     exp_name = args.exp_name
+    #endregion
 
+    # Device choice
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    # Model initialization
     model = create_model()
 
+    #region Dataset preparation
     transformations = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor(),
@@ -69,7 +83,9 @@ def main():
     val_loader = torch.utils.data.DataLoader(
         val_dataset, batch_size=batch_size, shuffle=False, num_workers=4,
         collate_fn=collate_fn)
+    #endregion
 
+    #region Pretraining preparations
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.SGD(params, lr=0.005,
                                 momentum=0.9, weight_decay=0.0005)
@@ -77,10 +93,13 @@ def main():
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                    step_size=3,
                                                    gamma=0.1)
+    #endregion
 
+    #region Model training
     for epoch in range(num_epochs):
         model.train()
 
+        #region Batch training
         for images, targets in tqdm.tqdm(train_loader):
             images = list(image.to(device) for image in images)
             targets = [{k: v.to(device)
@@ -91,7 +110,9 @@ def main():
             optimizer.zero_grad()
             losses.backward()
             optimizer.step()
+        #endregion
 
+        #region Batch validation
         batch_losses = []
         for images, targets in tqdm.tqdm(val_loader):
             images = list(image.to(device) for image in images)
@@ -104,8 +125,12 @@ def main():
 
         batch_losses = np.array(batch_losses)
         batch_losses = batch_losses[np.isfinite(batch_losses)]
+        
         print(f'Epoch: {epoch}, Valid_loss: {np.mean(batch_losses)}')
+        #endregion
+
         lr_scheduler.step()
+    #endregion
 
     save_model(model, f'{exp_name}_{num_epochs}.pth', output_path)
 
