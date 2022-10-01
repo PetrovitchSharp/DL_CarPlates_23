@@ -38,7 +38,16 @@ def recognize_car_plate(img_path: str, model: nn.Module,
     model.cpu()
     model.eval()
 
-    img = load_image(img_path)
+    transformations = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )
+    ])
+
+    img = load_image(img_path, transformations)
 
     predictions = model([img])
     predictions = [detach_dict(pred) for pred in predictions]
@@ -72,11 +81,14 @@ def recognize_car_plate(img_path: str, model: nn.Module,
                 decoder='beamsearch',
                 allowlist=' УКЕНВАРОСМИТХ1234567890'))
 
+    plt.ioff()
     plt.close()
 
     fig, ax = plt.subplots()
 
     image = unnormalize(img)
+
+    ax.imshow(image.numpy().transpose([1,2,0]))
 
     for idx in range(plates_count):
         x0 = int(boxes[idx][0]) - 10
