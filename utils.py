@@ -14,8 +14,10 @@ def create_model() -> torch.nn.Module:
     Returns:
         Customized model
     '''
+    # Device choice
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
+    # Initializing model with custom prediction head
     model = torchvision.models.detection.fasterrcnn_resnet50_fpn(
         pretrained=True)
     num_classes = 2
@@ -99,8 +101,10 @@ def load_image(img_path: str, transformations: transforms.Compose) -> torch.Tens
         Loaded image
     '''
     image = cv2.imread(img_path)
+    # conversion from BGR to RGB color space 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
+    # Additional transformations
     if transformations is not None:
         image = transforms(image)
 
