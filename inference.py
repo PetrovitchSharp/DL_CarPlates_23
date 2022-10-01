@@ -1,14 +1,15 @@
+import argparse
+from pathlib import Path
 from typing import List
 
-import cv2
-import torch
-from torchvision import transforms
-import torch.nn as nn
 import easyocr
-import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+import torch
+import torch.nn as nn
+from torchvision import transforms
 
-from utils import load_model, load_image, detach_dict
+from utils import detach_dict, load_image, load_model
 
 
 def get_boxes(predictions: List, threshold: float) -> List[torch.Tensor]:
@@ -25,8 +26,8 @@ def get_boxes(predictions: List, threshold: float) -> List[torch.Tensor]:
     return predictions[0]['boxes'][predictions[0]['scores'] > threshold]
 
 
-def recognize_car_plate(img_path: str, model: nn.Module,
-                        save_path: str) -> None:
+def recognize_car_plate(img_path: Path, model: nn.Module,
+                        save_path: Path) -> None:
     '''
     Recognize car plate on image
 
@@ -80,7 +81,7 @@ def recognize_car_plate(img_path: str, model: nn.Module,
                 f'plate_{idx}.jpg',
                 decoder='beamsearch',
                 allowlist=' УКЕНВАРОСМИТХ1234567890'))
-
+        Path(f'plate_{idx}.jpg').unlink()
     plt.ioff()
     plt.close()
 
@@ -88,7 +89,7 @@ def recognize_car_plate(img_path: str, model: nn.Module,
 
     image = unnormalize(img)
 
-    ax.imshow(image.numpy().transpose([1,2,0]))
+    ax.imshow(image.numpy().transpose([1, 2, 0]))
 
     for idx in range(plates_count):
         x0 = int(boxes[idx][0]) - 10
@@ -116,7 +117,43 @@ def recognize_car_plate(img_path: str, model: nn.Module,
             f'Probability: {plate_score*100:.2f} %',
             color='white')
 
-    print(f'License plate: {plate_num}')
-    print(f'Probability: {plate_score*100:.2f} %')
+    print(f'License plate: {plate_num}, p={plate_score*100:.2f}%')
 
     fig.savefig(save_path)
+
+
+def make_parser():
+    parser = argparse.ArgumentParser(
+        description='Train carplate model'
+        )
+    parser.add_argument('-img', type=str,
+                        default='',
+                        help='path to image')
+    parser.add_argument('-output', type=str,
+                        default='output',
+                        help='output path')
+    parser.add_argument('-model', type=str,
+                        default='',
+                        help='path to model')
+    return parser
+
+
+def main():
+    parser = make_parser()
+    args = parser.parse_args()
+    img_path = args.img
+    output_path = args.output
+    model_path = args.model
+
+    if img_path == '':
+        print('You need to pass a correct image path')
+    img_path = Path(img_path)
+    output_path = Path(output_path)
+    output_path.mkdir(exist_ok=True)
+
+    model = load_model(model_path)
+    recognize_car_plate(img_path, model, output_path / img_path.name)
+
+
+if __name__ == '__main__':
+    main()

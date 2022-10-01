@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import List
 
+import cv2
 import torch
 import torchvision
-from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision import transforms
+from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
 
 def create_model() -> torch.nn.Module:
@@ -54,7 +55,7 @@ def load_model(path: str) -> torch.nn.Module:
     Returns:
         FasterRCNN model with loaded weights
     '''
-    with open('../input/frcnn-model/fasterrcnn_resnet50_fpn', 'rb') as fp:
+    with open(path, 'rb') as fp:
         state_dict = torch.load(fp, map_location="cpu")
 
     model = create_model()
@@ -89,7 +90,8 @@ def detach_dict(pred: dict) -> dict:
     return {k: v.detach().cpu() for (k, v) in pred.items()}
 
 
-def load_image(img_path: str, transformations: transforms.Compose) -> torch.Tensor:
+def load_image(img_path: Path, transformations: transforms.Compose
+               ) -> torch.Tensor:
     '''
     Load image from file
 
@@ -100,12 +102,12 @@ def load_image(img_path: str, transformations: transforms.Compose) -> torch.Tens
     Returns:
         Loaded image
     '''
-    image = cv2.imread(img_path)
+    image = cv2.imread(str(img_path))
     # conversion from BGR to RGB color space 
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # Additional transformations
     if transformations is not None:
-        image = transforms(image)
+        image = transformations(image)
 
     return image

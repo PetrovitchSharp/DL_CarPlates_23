@@ -13,3 +13,14 @@ Car plates recognition command line application
         -batch_size BATCH_SIZE
                                 batch size
         -exp_name EXP_NAME    experiment name
+
+1. Inference - inference.py
+
+    Inference script make a prediction for an image. The result is printed to the console and saved to the output directory in jpg format.
+
+    Inference CLI can be used with following parameters:
+
+        -h, --help      show this help message and exit
+        -img IMG        path to image
+        -output OUTPUT  output path
+        -model MODEL    path to model

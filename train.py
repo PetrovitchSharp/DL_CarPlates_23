@@ -44,7 +44,6 @@ def main() -> None:
     #region Arguments parsing
     parser = make_parser()
     args = parser.parse_args()
-    print(args)
     data_path = args.data
     output_path = args.output
     num_epochs = args.num_epochs
