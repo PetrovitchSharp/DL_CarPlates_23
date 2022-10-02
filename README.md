@@ -54,3 +54,12 @@ Car plates recognition command line application
                                 path to model
 
     Result will be printed to console and saved to the output folder as a jpg.
+
+
+## Example of inference (on test.jpg):
+
+Y654BE77 [ 96.55244 434.03857 185.2982  480.91248] p=0.9996976852416992
+
+Also result is saved to output directory:
+
+![Output](https://github.com/PetrovitchSharp/DL_CarPlates_23/dev/inference_example.jpg)
