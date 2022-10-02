@@ -263,7 +263,7 @@ def make_parser() -> argparse.ArgumentParser:
                         default='output',
                         help='output path')
     parser.add_argument('-detection_model', type=str,
-                        default='model_detection/fasterrcnn_1.pth',
+                        default='model_detection/fasterrcnn.pth',
                         help='path to model')
     parser.add_argument('-recognition_model', type=str,
                         default='model_recognition/CRNN.pth',

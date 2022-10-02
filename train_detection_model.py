@@ -131,7 +131,7 @@ def main() -> None:
         lr_scheduler.step()
     #endregion
 
-    save_model(model, f'{exp_name}_{num_epochs}.pth', output_path)
+    save_model(model, f'{exp_name}.pth', output_path)
 
     print("Training is finished")
 
