@@ -37,12 +37,16 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
 
         self.transforms = transforms
 
+        # Loading of train data
         plates_filename = self.root / 'train.json'
         with open(plates_filename) as f:
             json_data = json.load(f)
+
+        # Train\Validation split
         train_valid_border = int(len(json_data) * train_size) + 1
         data_range = (0, train_valid_border) if mode == 'train' \
             else (train_valid_border, len(json_data))
+        
         self.load_data(json_data[data_range[0]:data_range[1]])
         return
 
@@ -58,26 +62,33 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
                 continue
             self.image_names.append(self.root / sample['file'])
             self.image_ids.append(torch.Tensor([i]))
+
             boxes = []
             texts = []
             areas = []
+
             for box in sample['nums']:
+                # Getting bound box of car plate
                 points = np.array(box['box'])
                 x_0 = np.min([points[0][0], points[3][0]])
                 y_0 = np.min([points[0][1], points[1][1]])
                 x_1 = np.max([points[1][0], points[2][0]])
                 y_1 = np.max([points[2][1], points[3][1]])
 
+                # Coordinates are mixed up in some files
                 if x_0 > x_1:
                     x_1, x_0 = x_0, x_1
                 if y_0 > y_1:
                     y_1, y_0 = y_0, y_1
+
                 boxes.append([x_0, y_0, x_1, y_1])
 
                 texts.append(box['text'])
                 areas.append(np.abs(x_0 - x_1) * np.abs(y_0 - y_1))
+
             boxes = torch.FloatTensor(boxes)
             areas = torch.FloatTensor(areas)
+
             self.image_boxes.append(boxes)
             self.image_texts.append(texts)
             self.box_areas.append(areas)
@@ -90,16 +101,21 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
             idx: Index of image in dataset
         '''
         target = {}
+
+        # Filling target dict with information about image
         if self.image_boxes is not None:
             boxes = self.image_boxes[idx].clone()
             areas = self.box_areas[idx].clone()
+
             num_boxes = boxes.shape[0]
+
             target['boxes'] = boxes
             target['area'] = areas
             target['labels'] = torch.LongTensor([1] * num_boxes)
             target['image_id'] = self.image_ids[idx].clone()
             target['iscrowd'] = torch.Tensor([False] * num_boxes)
 
+        # Loading image itself
         image = load_image(str(self.image_names[idx]), self.transforms)
         
         return image, target

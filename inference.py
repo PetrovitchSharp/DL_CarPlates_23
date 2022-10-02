@@ -39,6 +39,7 @@ def recognize_car_plate(img_path: Path, model: nn.Module,
     model.cpu()
     model.eval()
 
+    # We need to normalize image before passing through model
     transformations = transforms.Compose([
         transforms.ToPILImage(),
         transforms.ToTensor(),
@@ -54,8 +55,10 @@ def recognize_car_plate(img_path: Path, model: nn.Module,
     predictions = [detach_dict(pred) for pred in predictions]
 
     boxes = get_boxes(predictions, 0.9)
+    # We can have several car plates in an image
     plates_count = len(boxes)
 
+    # We need to unnormalize image after passing through model
     unnormalize_1 = transforms.Normalize(mean=[-0.485, -0.456, -0.406],
                                          std=[1, 1, 1])
     unnormalize_2 = transforms.Normalize(mean=[0, 0, 0],
@@ -63,12 +66,17 @@ def recognize_car_plate(img_path: Path, model: nn.Module,
     unnormalize = transforms.Compose([unnormalize_2, unnormalize_1])
 
     for idx, box in enumerate(boxes):
+        # Slight expansion of the frame for ease of recognition
         x0 = int(box[0]) - 20
         x1 = int(box[2]) + 20
         y0 = int(box[1]) - 20
         y1 = int(box[3]) + 20
 
+        # Image cropping
         im = unnormalize(img).numpy().transpose([1, 2, 0])[y0:y1, x0:x1]
+
+        # Temporary saving of an image
+        # It is more convenient to feed saved images into the model than to convert the tensor to the desired format )))
         plt.imsave(f'plate_{idx}.jpg', im)
 
     detections = []
@@ -81,7 +89,10 @@ def recognize_car_plate(img_path: Path, model: nn.Module,
                 f'plate_{idx}.jpg',
                 decoder='beamsearch',
                 allowlist=' УКЕНВАРОСМИТХ1234567890'))
+        # Deleting temporary file
         Path(f'plate_{idx}.jpg').unlink()
+
+    # We don't need to plot an image, just add boxes and text and save 
     plt.ioff()
     plt.close()
 
@@ -97,6 +108,7 @@ def recognize_car_plate(img_path: Path, model: nn.Module,
         y0 = int(boxes[idx][1]) - 10
         y1 = int(boxes[idx][3]) + 10
 
+        # Adding bound box to an image
         rect = patches.Rectangle(
             (x0,
              y0),
@@ -110,6 +122,7 @@ def recognize_car_plate(img_path: Path, model: nn.Module,
         plate_num = detections[idx][0][1]
         plate_score = detections[idx][0][2]
 
+        # Adding text with licence plate and probability below bound box
         ax.text(x0, y1 + 50, f'License plate: {plate_num}', color='white')
         ax.text(
             x0,
@@ -119,10 +132,17 @@ def recognize_car_plate(img_path: Path, model: nn.Module,
 
     print(f'License plate: {plate_num}, p={plate_score*100:.2f}%')
 
+    # Saving image with detections
     fig.savefig(save_path)
 
 
-def make_parser():
+def make_parser() -> argparse.ArgumentParser:
+    '''
+    Make cli arguments parser
+
+    Returns:
+        CLI args parser
+    '''
     parser = argparse.ArgumentParser(
         description='Train carplate model'
         )
@@ -138,12 +158,17 @@ def make_parser():
     return parser
 
 
-def main():
+def main() -> None:
+    '''
+    Main function responsible for model inference on a single image
+    '''
+    #region Arguments parsing
     parser = make_parser()
     args = parser.parse_args()
     img_path = args.img
     output_path = args.output
     model_path = args.model
+    #endregion
 
     if img_path == '':
         print('You need to pass a correct image path')
