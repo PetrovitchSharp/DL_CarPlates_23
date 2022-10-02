@@ -7,6 +7,8 @@ import torchvision
 from torchvision import transforms
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
+from recognition import CRNN
+
 
 def create_model() -> torch.nn.Module:
     '''
@@ -62,6 +64,24 @@ def load_model(path: str) -> torch.nn.Module:
     model.load_state_dict(state_dict)
 
     return model
+
+
+def load_recognition_model(path: str) -> torch.nn.Module:
+    '''
+    Load trained model from file
+
+    Args:
+        path: Path to model's weights
+
+    Returns:
+        RCNN model with loaded weights
+    '''
+    with open(path, 'rb') as fp:
+        state_dict = torch.load(fp, map_location="cpu")
+    crnn = CRNN(rnn_bidirectional=True)
+    crnn.load_state_dict(state_dict)
+
+    return crnn
 
 
 def collate_fn(samples: List) -> tuple:

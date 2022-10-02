@@ -1,3 +1,10 @@
 data
+__pycache__
 *.pyc
 .python-version
+ocr_data
+test_ocr_data
+model_recognition
+model_detection
+language_model_space.pkl
+output
