@@ -62,4 +62,4 @@ Y654BE77 [ 96.55244 434.03857 185.2982  480.91248] p=0.9996976852416992
 
 Also result is saved to output directory:
 
-![Output](https://github.com/PetrovitchSharp/DL_CarPlates_23/dev/inference_example.jpg)
+![Example](https://github.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/inference_example.jpg)
