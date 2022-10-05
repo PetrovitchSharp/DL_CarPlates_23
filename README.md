@@ -83,3 +83,14 @@ Inference:
 On GPU: 0.57 sec/image
 
 On CPU: 1.33 sec/image
+
+## Choice and justification of the metric
+
+The IOU metric was chosen as the detection metric. The selection of hyperparameters was carried out for the detection model. The data is presented in the table below.
+
+| Model | Optimizer | Learning rate | Metric value (IOU) |
+| --- | --- | --- | --- |
+| FastRCNN | SGD | 0.005 | 0.8144 |
+| FastRCNN | SGD | 0.001 | 0.843 |
+| FastRCNN | Adam | 0.005 | 0.0 |
+| FastRCNN | Adam | 0.001 | 0.0 |
