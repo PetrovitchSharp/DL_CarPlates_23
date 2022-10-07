@@ -1,96 +1,104 @@
-# DL_CarPlates_23
-Car plates recognition command line application
+# Распознавание автомобильных номеров RU-региона на основе искусственного интеллекта
 
-1. Please download dataset from https://disk.yandex.ru/d/NANSgQklgRElog
+## Описание данных
 
-1. Detection model - FasterRCNN - train_detection_model.py
+В качестве исходных данных для решения задачи был использован датасет https://disk.yandex.ru/d/NANSgQklgRElog , состоящий из более чем 25 тысяч изображений автомобилей для обучения моделей и более чем 3 тысяч изображений для тестирования обученных моделей. Вместе с датасетом прилагается файл train.json, содержащий разметку для тестовой части.
 
-    Training CLI can be used with following parameters:
+## Выбор и обоснование метрик
 
-        -h, --help            show this help message and exit
-        -data DATA            dataset path
-        -output OUTPUT        output path
-        -num_epochs NUM_EPOCHS
-                                train epochs
-        -batch_size BATCH_SIZE
-                                batch size
-        -exp_name EXP_NAME    experiment name
+В качестве метрики на этапе детекции была выбрана [IoU](https://medium.com/analytics-vidhya/iou-intersection-over-union-705a39e7acef) - метрика, рассчитываемая как отношение площади пересечения истинного и предсказанного bounding box'ов к площади их объединения.
 
-1. Create dataset for text recognition
+![IoU](https://habrastorage.org/r/w1560/webt/hg/xi/zj/hgxizjtbx6vlispj9rl8nzfvhsu.png)
 
-    create_ocr_dataset.py can be used with following parameters:
+Данные по подбору гиперпараметров представлены в таблице ниже.
 
-        -h, --help      show this help message and exit
-        -data DATA      data path
-        -output OUTPUT  output path
-
-1. Recognition model training - train_recognition_model.py
-
-    Training CLI can be used with following parameters:
-
-        -h, --help            show this help message and exit
-        -data DATA            dataset path
-        -output OUTPUT        output path
-        -num_epochs NUM_EPOCHS
-                                train epochs
-        -batch_size BATCH_SIZE
-                                batch size
-        -exp_name EXP_NAME    experiment name
-
-1. Create car plates language model for beam search - create_language_model.py
-
-1. Inference - inference.py
-
-    Inference script make a prediction for an image. The result is printed to the console and saved to the output directory in jpg format.
-
-    Inference CLI can be used with following parameters:
-
-        -h, --help            show this help message and exit
-        -img IMG              path to image
-        -output OUTPUT        output path
-        -detection_model DETECTION_MODEL
-                                path to model
-        -recognition_model RECOGNITION_MODEL
-                                path to model
-
-    Result will be printed to console and saved to the output folder as a jpg.
-
-
-## Example of inference (on test.jpg):
-
-Y654BE77 [ 96.55244 434.03857 185.2982  480.91248] p=0.9996976852416992
-
-Also result is saved to output directory:
-
-![Example](https://github.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/inference_example.jpg)
-
-## Performance:
-
-Performance evaluation performed on the following hardware:
-
-GPU: NVIDIA GeForce RTX 3090 (24 GB, 1.70 GHz, 10496 CUDA cores)
-
-CPU: AMD Ryzen 9 5900X (12 cores, 24 Threads, 3.7 GHz) 
-
-Train:
-
-Recognition model: 15 min/epoch
-
-Language model: 1.25 min/epoch
-
-Inference:
-
-On GPU: 0.57 sec/image
-
-On CPU: 1.33 sec/image
-
-## Choice and justification of the metric
-
-The IOU metric was chosen as the detection metric. The selection of hyperparameters was carried out for the detection model. The data is presented in the table below.
-
-| Model | Optimizer | Learning rate | Metric value (IOU) |
+| Модель | Оптимизатор | Learning rate | IOU |
 | --- | --- | --- | --- |
 | FastRCNN | SGD | 0.005 | 0.8144 |
 | FastRCNN | SGD | 0.001 | 0.843 |
 | FastRCNN | Adam | 0.005 | 0.8123 |
 | FastRCNN | Adam | 0.001 | 0.838 |
+
+В качестве метрики на этапе распознания текста на автомобильных номерах было выбрано [расстояние Левенштейна](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D1%81%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D0%B5_%D0%9B%D0%B5%D0%B2%D0%B5%D0%BD%D1%88%D1%82%D0%B5%D0%B9%D0%BD%D0%B0) - метрика, измеряющая по модулю разность между двумя последовательностями символов. Она определяется как минимальное количество односимвольных операций (вставки, удаления, замены), необходимых для превращения одной последовательности символов в другую.
+
+## Порядок запуска:
+
+### Обучение моделей
+
+1. Загрузите датасет для обучения моделей https://disk.yandex.ru/d/NANSgQklgRElog
+
+2. Обучите модель обнаружения автомобильных номеров - train_detection_model.py
+
+    При запуске обучающего скрипта из командной строки могут быть указаны следующие параметры:
+
+        -h, --help              Показать данное сообщение и выйти
+        -data DATA              Путь к обучающему датасету
+        -output OUTPUT          Путь для сохранения модели
+        -num_epochs NUM_EPOCHS  Количество обучающих эпох
+        -batch_size BATCH_SIZE  Размер бача
+        -exp_name EXP_NAME      Название файла с моделью
+
+3. Создайте датасет для обучения модели распознавания текста на номерах - create_ocr_dataset.py
+
+     При запуске скрипта из командной строки могут быть указаны следующие параметры:
+
+        -h, --help      Показать данное сообщение и выйти
+        -data DATA      Путь к необработанному датасету
+        -output OUTPUT  Путь для сохранения датасета
+
+4. Обучите модель для распознавания текста - train_recognition_model.py
+
+    При запуске обучающего скрипта из командной строки могут быть указаны следующие параметры:
+
+        -h, --help              Показать данное сообщение и выйти
+        -data DATA              Путь к обучающему датасету
+        -output OUTPUT          Путь для сохранения модели
+        -num_epochs NUM_EPOCHS  Количество обучающих эпох
+        -batch_size BATCH_SIZE  Размер бача
+        -exp_name EXP_NAME      Название файла с моделью
+
+5. Создайте языковую модель для beamsearch - create_language_model.py
+
+### Запуск пайплайна
+
+1. Запустите инференс - inference.py
+
+    Данный скрипт обрабатывает одно изображение. Результат работы пайплайна выводится в консоль и сохраняется в выбранной директории в формате jpg. 
+    
+    При запуске скрипта из командной строки могут быть указаны следующие параметры:
+
+        -h, --help                              Показать данное сообщение и выйти
+        -img IMG                                Путь к изображению
+        -output OUTPUT                          Путь для сохранения обработанного изображения
+        -detection_model DETECTION_MODEL        Путь к модели детекции автомобильных номеров
+        -recognition_model RECOGNITION_MODEL    Путь к модели распознания текста на номерах
+
+## Пример инференса:
+
+Вывод в консоль при запуске пайплайна для [тестового изображения](test.jpg)
+
+Y654BE77 [ 96.55244 434.03857 185.2982  480.91248] p=0.9996976852416992
+
+Сохраненный в виде изображения результат:
+
+![Example](https://github.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/inference_example.jpg)
+
+## Производительность:
+
+Рассчет производительности был выполнен на следующих комплектующих:
+
+GPU: NVIDIA GeForce RTX 3090 (24 GB, 1.70 GHz, 10496 CUDA cores)
+
+CPU: AMD Ryzen 9 5900X (12 cores, 24 Threads, 3.7 GHz) 
+
+### Обучение:
+
+Модель детекции: 15 min/epoch
+
+Модель распознания текста: 1.25 min/epoch
+
+### Инференс:
+
+На GPU: 0.57 sec/image
+
+На CPU: 1.33 sec/image
