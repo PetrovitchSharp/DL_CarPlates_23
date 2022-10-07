@@ -10,7 +10,7 @@ import torch.nn as nn
 import torchvision.models as models
 from torch.utils import data
 
-from recognition_utils import normalize_text
+from src.recognition_utils import normalize_text
 
 
 class RecognitionDataset(data.Dataset):

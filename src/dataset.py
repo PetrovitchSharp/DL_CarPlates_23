@@ -8,7 +8,7 @@ import torch
 from torch.utils import data
 from torchvision import transforms
 
-from utils import load_image
+from src.utils import load_image
 
 
 class CarPlatesDatasetWithRectangularBoxes(data.Dataset):

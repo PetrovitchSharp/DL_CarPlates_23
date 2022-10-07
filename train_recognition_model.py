@@ -9,8 +9,8 @@ import tqdm
 from Levenshtein import distance
 from torchvision import transforms
 
-from recognition import CRNN, RecognitionDataset
-from recognition_utils import Resize, collate_fn_recognition, decode
+from src.recognition import CRNN, RecognitionDataset
+from src.recognition_utils import Resize, collate_fn_recognition, decode
 
 
 def make_parser() -> argparse.ArgumentParser:

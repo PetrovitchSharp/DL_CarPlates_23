@@ -8,9 +8,9 @@ import cv2
 import numpy as np
 import tqdm
 
-from detection_utils import (PlateImageAdjuster, PlateImageExtractor,
+from src.detection_utils import (PlateImageAdjuster, PlateImageExtractor,
                              build_mask, get_rectangular_box)
-from recognition_utils import normalize_text
+from src.recognition_utils import normalize_text
 
 
 def make_parser() -> argparse.ArgumentParser:

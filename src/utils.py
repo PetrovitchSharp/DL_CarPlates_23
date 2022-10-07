@@ -7,7 +7,7 @@ import torchvision
 from torchvision import transforms
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 
-from recognition import CRNN
+from src.recognition import CRNN
 
 
 def create_model() -> torch.nn.Module:

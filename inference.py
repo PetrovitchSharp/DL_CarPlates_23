@@ -14,10 +14,10 @@ import tqdm
 from matplotlib import pyplot as plt
 from torchvision import transforms
 
-from detection_utils import PlateImageAdjuster
-from recognition import LanguageModel, RecognitionDataset, beam_search
-from recognition_utils import Resize, collate_fn_recognition_test
-from utils import load_image, load_model, load_recognition_model
+from src.detection_utils import PlateImageAdjuster
+from src.recognition import LanguageModel, RecognitionDataset, beam_search
+from src.recognition_utils import Resize, collate_fn_recognition_test
+from src.utils import load_image, load_model, load_recognition_model
 
 
 def get_boxes(predictions: List, threshold: float) -> List[torch.Tensor]:

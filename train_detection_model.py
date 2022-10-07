@@ -5,8 +5,8 @@ import torch
 import tqdm
 from torchvision import transforms
 
-from dataset import load_dataset
-from utils import collate_fn, create_model, save_model
+from src.dataset import load_dataset
+from src.utils import collate_fn, create_model, save_model
 
 
 def make_parser() -> argparse.ArgumentParser:
