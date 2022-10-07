@@ -1,8 +1,9 @@
-# Распознавание автомобильных номеров RU-региона на основе искусственного интеллекта
+# DL_CarPlates_23
+Распознавание автомобильных номеров RU-региона на основе искусственного интеллекта
 
 ## Описание данных
 
-В качестве исходных данных для решения задачи был использован датасет https://disk.yandex.ru/d/NANSgQklgRElog , состоящий из более чем 25 тысяч изображений автомобилей для обучения моделей и более чем 3 тысяч изображений для тестирования обученных моделей. Вместе с датасетом прилагается файл train.json, содержащий разметку для тестовой части.
+В качестве исходных данных для решения задачи был использован [датасет](https://disk.yandex.ru/d/NANSgQklgRElog), состоящий из более чем 25 тысяч изображений автомобилей для обучения моделей и более чем 3 тысяч изображений для тестирования обученных моделей. Вместе с датасетом прилагается файл train.json, содержащий разметку для тестовой части.
 
 ## Выбор и обоснование метрик
 
@@ -21,67 +22,125 @@
 
 В качестве метрики на этапе распознания текста на автомобильных номерах было выбрано [расстояние Левенштейна](https://ru.wikipedia.org/wiki/%D0%A0%D0%B0%D1%81%D1%81%D1%82%D0%BE%D1%8F%D0%BD%D0%B8%D0%B5_%D0%9B%D0%B5%D0%B2%D0%B5%D0%BD%D1%88%D1%82%D0%B5%D0%B9%D0%BD%D0%B0) - метрика, измеряющая по модулю разность между двумя последовательностями символов. Она определяется как минимальное количество односимвольных операций (вставки, удаления, замены), необходимых для превращения одной последовательности символов в другую.
 
-## Порядок запуска:
+---
+## Установка зависимостей
 
-### Обучение моделей
+Наш проект используею python 3.10
 
-1. Загрузите датасет для обучения моделей https://disk.yandex.ru/d/NANSgQklgRElog
+Зависимости для нашего проекта можно установить 2-мя способами:
 
-2. Обучите модель обнаружения автомобильных номеров - train_detection_model.py
+1. Используя файл requirements.txt:
 
-    При запуске обучающего скрипта из командной строки могут быть указаны следующие параметры:
+    <code>python -m pip install -r requirements.txt</code>
 
-        -h, --help              Показать данное сообщение и выйти
-        -data DATA              Путь к обучающему датасету
-        -output OUTPUT          Путь для сохранения модели
-        -num_epochs NUM_EPOCHS  Количество обучающих эпох
-        -batch_size BATCH_SIZE  Размер бача
-        -exp_name EXP_NAME      Название файла с моделью
+1. Используя [poetry](https://python-poetry.org/)
+        
+    <code>poetry install</code>
 
-3. Создайте датасет для обучения модели распознавания текста на номерах - create_ocr_dataset.py
+> Важно: сейчас в зависимостях указаны версии torch и torchvision для gpu и cuda version 11.6, если у вас нет gpu, или установлена другая cuda - то нужно использовать [другую версию библиотек](https://download.pytorch.org/whl/torch/).
 
-     При запуске скрипта из командной строки могут быть указаны следующие параметры:
+## Запуск пайплайна
 
-        -h, --help      Показать данное сообщение и выйти
-        -data DATA      Путь к необработанному датасету
-        -output OUTPUT  Путь для сохранения датасета
+1. Скачайте обученные модели и сохраните их в папку models:
+    - [Модель для детекции](https://drive.google.com/file/d/1KzihK_plnYH-muKX_uLwXz3HXNJusatA/view?usp=sharing)
+    - [Языковую модель](https://drive.google.com/file/d/1VTMGXVv6EhlLH8Mbn1njy0oCH5W3JWI3/view?usp=sharing)
+    - [Модель для распознавания текста](https://drive.google.com/file/d/1VcI-mEBKsDv0k79lcocxwvAMAYX6dl9v/view?usp=sharing)
 
-4. Обучите модель для распознавания текста - train_recognition_model.py
+1. Скачайте [датасет от компании VK](https://disk.yandex.ru/d/NANSgQklgRElog) и распакуйте его в папку data
 
-    При запуске обучающего скрипта из командной строки могут быть указаны следующие параметры:
+1. Запуск - inference.py
 
-        -h, --help              Показать данное сообщение и выйти
-        -data DATA              Путь к обучающему датасету
-        -output OUTPUT          Путь для сохранения модели
-        -num_epochs NUM_EPOCHS  Количество обучающих эпох
-        -batch_size BATCH_SIZE  Размер бача
-        -exp_name EXP_NAME      Название файла с моделью
+    Скрипт обрабатывает одно изображение:
 
-5. Создайте языковую модель для beamsearch - create_language_model.py
-
-### Запуск пайплайна
-
-1. Запустите инференс - inference.py
-
-    Данный скрипт обрабатывает одно изображение. Результат работы пайплайна выводится в консоль и сохраняется в выбранной директории в формате jpg. 
+    - детекция
+    - обработка найденных автомобильных номеров
+    - распознавание текста
+    - постобработка
     
-    При запуске скрипта из командной строки могут быть указаны следующие параметры:
+    Результат выводится в терминал, а также сохраняется в формате jpg в папку output
 
-        -h, --help                              Показать данное сообщение и выйти
-        -img IMG                                Путь к изображению
-        -output OUTPUT                          Путь для сохранения обработанного изображения
-        -detection_model DETECTION_MODEL        Путь к модели детекции автомобильных номеров
-        -recognition_model RECOGNITION_MODEL    Путь к модели распознания текста на номерах
+    Параметры для использования скрипта:
 
-## Пример инференса:
+        -h, --help            show this help message and exit
+        -img IMG              path to image
+        -output OUTPUT        output path
+        -detection_model DETECTION_MODEL
+                                path to model
+        -recognition_model RECOGNITION_MODEL
+                                path to model
 
-Вывод в консоль при запуске пайплайна для [тестового изображения](test.jpg)
+## Обучение моделей
+
+1. Скачайте [датасет от компании VK](https://disk.yandex.ru/d/NANSgQklgRElog) и распакуйте его в папку data
+
+1. Detection model - FasterRCNN - train_detection_model.py
+
+    Параметры для использования скрипта::
+
+        -h, --help            show this help message and exit
+        -data DATA            dataset path
+        -output OUTPUT        output path
+        -num_epochs NUM_EPOCHS
+                                train epochs
+        -batch_size BATCH_SIZE
+                                batch size
+        -exp_name EXP_NAME    experiment name
+
+1. Подготовьте датасет для обучения модели распознавания текста:
+
+    create_ocr_dataset.py может быть использован с такими параметрами:
+
+        -h, --help      show this help message and exit
+        -data DATA      data path
+        -output OUTPUT  output path
+
+1. Обучение модели распознавания - train_recognition_model.py
+
+    Параметры для использования скрипта::
+
+        -h, --help            show this help message and exit
+        -data DATA            dataset path
+        -output OUTPUT        output path
+        -num_epochs NUM_EPOCHS
+                                train epochs
+        -batch_size BATCH_SIZE
+                                batch size
+        -exp_name EXP_NAME    experiment name
+
+1. Построение языковой модели для beam search'a - create_language_model.py
+
+
+## Пример работы системы (on test.jpg):
 
 Y654BE77 [ 96.55244 434.03857 185.2982  480.91248] p=0.9996976852416992
 
 Сохраненный в виде изображения результат:
 
 ![Example](https://github.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/inference_example.jpg)
+
+
+---
+## Описание системы
+
+### Детекция
+Мы используем сеть Faster RCNN с backbone resnet50.
+
+### Обработка найденных автомобильных номеров:
+- Увеличение контрастности изображений (приводим к одному и тому же значению контрастности)
+- Выравнивание баланса цветов (каждый канал отдельно преобразовывался так чтобы <=15% пикселей были равны 0 или 255, а остальные растягивались на весь промежуток)
+- Увеличение резкости с использованием гауссиана (изображение размывается гауссианом, а затем размытое, умноженное на константу, вычитается из исходного изображения)
+
+Пример результата обработки изображения:
+
+![Figure 1](https://raw.githubusercontent.com/mikgur/MADE_CV_car_plates/master/figures/augmented_plates_1.png)
+
+![Figure 2](https://raw.githubusercontent.com/mikgur/MADE_CV_car_plates/master/figures/augmented_plates_2.png)
+
+### Распознавание текста
+Мы используем модель CRNN с CTC лоссом.
+
+### Постобработка
+Внесение правок в предсказание модели с использованием [beam search](https://towardsdatascience.com/foundations-of-nlp-explained-visually-beam-search-how-it-works-1586b9849a24)'a и языковой модели
 
 ## Производительность:
 
@@ -102,3 +161,4 @@ CPU: AMD Ryzen 9 5900X (12 cores, 24 Threads, 3.7 GHz)
 На GPU: 0.57 sec/image
 
 На CPU: 1.33 sec/image
+
