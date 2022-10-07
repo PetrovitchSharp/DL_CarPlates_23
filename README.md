@@ -116,7 +116,7 @@ Y654BE77 [ 96.55244 434.03857 185.2982  480.91248] p=0.9996976852416992
 
 Сохраненный в виде изображения результат:
 
-![Example](https://github.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/inference_example.jpg)
+![Example](https://raw.githubusercontent.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/img/inference_example.jpg)
 
 
 ---
@@ -132,9 +132,9 @@ Y654BE77 [ 96.55244 434.03857 185.2982  480.91248] p=0.9996976852416992
 
 Пример результата обработки изображения:
 
-![Figure 1](https://raw.githubusercontent.com/mikgur/MADE_CV_car_plates/master/figures/augmented_plates_1.png)
+![Figure 1](https://raw.githubusercontent.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/img/augmented_plates_1.png)
 
-![Figure 2](https://raw.githubusercontent.com/mikgur/MADE_CV_car_plates/master/figures/augmented_plates_2.png)
+![Figure 2](https://raw.githubusercontent.com/PetrovitchSharp/DL_CarPlates_23/blob/dev/img/augmented_plates_2.png)
 
 ### Распознавание текста
 Мы используем модель CRNN с CTC лоссом.
