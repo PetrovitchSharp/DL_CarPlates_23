@@ -23,7 +23,7 @@ def make_parser() -> argparse.ArgumentParser:
                         default='data',
                         help='dataset path')
     parser.add_argument('-output', type=str,
-                        default='model_detection',
+                        default='models',
                         help='output path')
     parser.add_argument('-num_epochs', type=int,
                         default=10,

@@ -4,7 +4,6 @@ __pycache__
 .python-version
 ocr_data
 test_ocr_data
-model_recognition
-model_detection
+models
 language_model_space.pkl
 output

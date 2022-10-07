@@ -27,7 +27,7 @@ def make_parser() -> argparse.ArgumentParser:
                         default='ocr_data',
                         help='dataset path')
     parser.add_argument('-output', type=str,
-                        default='model_recognition',
+                        default='models',
                         help='output path')
     parser.add_argument('-num_epochs', type=int,
                         default=20,
