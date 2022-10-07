@@ -92,5 +92,5 @@ The IOU metric was chosen as the detection metric. The selection of hyperparamet
 | --- | --- | --- | --- |
 | FastRCNN | SGD | 0.005 | 0.8144 |
 | FastRCNN | SGD | 0.001 | 0.843 |
-| FastRCNN | Adam | 0.005 | 0.0 |
-| FastRCNN | Adam | 0.001 | 0.0 |
+| FastRCNN | Adam | 0.005 | 0.8123 |
+| FastRCNN | Adam | 0.001 | 0.838 |
