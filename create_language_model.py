@@ -16,7 +16,7 @@ def make_parser() -> argparse.ArgumentParser:
         description='Train recognition model'
         )
     parser.add_argument('-output', type=str,
-                        default='language_model_space.pkl',
+                        default='models/language_model_space.pkl',
                         help='output path')
     return parser
 

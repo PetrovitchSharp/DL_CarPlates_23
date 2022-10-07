@@ -298,7 +298,7 @@ def beam_search(ctc, alphabet, beam_width=2, lm=None, alpha=0.30, beta=4, verbos
 
 
 class LanguageModel:
-    def __init__(self, lm_file='language_model_space.pkl'):
+    def __init__(self, lm_file='models/language_model_space.pkl'):
         self.alphabet = '01234567890ABEKMHOPCTYX'
         with open(lm_file, 'rb') as f:
             self.lm = pickle.load(f)

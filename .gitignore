@@ -4,6 +4,7 @@ __pycache__
 .python-version
 ocr_data
 test_ocr_data
-models
-language_model_space.pkl
+models/CRNN.pth
+models/fasterrcnn.pth
+models/language_model_space.pkl
 output
