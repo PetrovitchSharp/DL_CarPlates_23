@@ -219,7 +219,14 @@ class CRNN(nn.Module):
 
 # Based on https://medium.com/corti-ai/ctc-networks-and-language-models-prefix-beam-search-explained-c11d1ee23306 # noqa E501
 
-def beam_search(ctc, alphabet, beam_width=2, lm=None, alpha=0.30, beta=4, verbose=False):
+def beam_search(
+    ctc, alphabet,
+    beam_width=2,
+    lm=None,
+    alpha=0.30,
+    beta=4,
+    verbose=False
+):
     ''' ctc: CTC-matrix time x len(alphabet)
         alphabet: alphabet
         beam_width - width used in beam search

@@ -79,7 +79,8 @@ def collate_fn_recognition_test(batch):
     Returns dict with same keys but values are either torch.Tensors of batched
     images, sequences, and so.
     """
-    images, images_bbox, seqs, seq_lens, texts, file_names = [], [], [], [], [], []
+    images, images_bbox, seqs = [], [], []
+    seq_lens, texts, file_names = [], [], []
     for sample in batch:
         images.append(sample["image"])
         images_bbox.append(sample["image_bbox"])

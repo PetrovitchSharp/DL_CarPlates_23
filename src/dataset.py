@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Tuple
 
 import numpy as np
-import cv2
 import torch
 from torch.utils import data
 from torchvision import transforms
@@ -46,7 +45,7 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
         train_valid_border = int(len(json_data) * train_size) + 1
         data_range = (0, train_valid_border) if mode == 'train' \
             else (train_valid_border, len(json_data))
-        
+
         self.load_data(json_data[data_range[0]:data_range[1]])
         return
 
@@ -117,7 +116,7 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
 
         # Loading image itself
         image = load_image(str(self.image_names[idx]), self.transforms)
-        
+
         return image, target
 
     def __len__(self) -> int:
@@ -131,7 +130,10 @@ class CarPlatesDatasetWithRectangularBoxes(data.Dataset):
 
 
 def load_dataset(
-        path: str, transformations: transforms.Compose, mode: str) -> CarPlatesDatasetWithRectangularBoxes:
+    path: str,
+    transformations: transforms.Compose,
+    mode: str
+) -> CarPlatesDatasetWithRectangularBoxes:
     '''
     Load images and create dataset containing them
 

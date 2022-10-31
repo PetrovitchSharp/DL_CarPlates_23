@@ -32,7 +32,7 @@ class PlateImageExtractor():
                 p = 1.5 * p
             num_iter += 1
         if corners != 4:
-            print(f"Couldn't converge")
+            print("Couldn't converge")
             return None
         return polygon.reshape(4, 2)
 

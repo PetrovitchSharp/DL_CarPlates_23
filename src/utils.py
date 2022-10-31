@@ -117,13 +117,13 @@ def load_image(img_path: Path, transformations: transforms.Compose
 
     Args:
         img_path:           Path to image
-        transformations:    Transformations to be done with image 
+        transformations:    Transformations to be done with image
 
     Returns:
         Loaded image
     '''
     image = cv2.imread(str(img_path))
-    # conversion from BGR to RGB color space 
+    # conversion from BGR to RGB color space
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     # Additional transformations
