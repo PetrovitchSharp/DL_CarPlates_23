@@ -29,9 +29,13 @@ def main():
     letters = 'ABEKMHOPCTYX'
     region_numbers = []
 
+    # License plate regions from 1 to 100
     for i in range(1, 100):
         region_numbers.append(f'{i:02}')
 
+    ''' Let's add other regions that can be in the license plate.
+    In Russia we have region numbers from 1 to 99, but in some cases
+    they can be over 100.'''
     additional = [102, 113, 116, 121, 123, 124, 125, 126, 134, 136,
                   138, 142, 150, 152, 154, 159, 161, 163, 164, 173,
                   174, 177, 178, 186, 190, 196, 197, 198, 199, 277,
@@ -52,6 +56,9 @@ def main():
                         ''.join([l_1, f'{num:03}', l_23, region, '-'])
                         )
 
+    # Create language model
+    # We iterate through all possible license plates from a001aa01
+    # to x999xx799 and count number of occurrences of each ngram
     language_model = defaultdict(int)
     for plate in tqdm.tqdm(plates):
         language_model[plate[0]] += 1
