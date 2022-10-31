@@ -217,8 +217,6 @@ class CRNN(nn.Module):
         return sequence
 
 
-# Based on https://medium.com/corti-ai/ctc-networks-and-language-models-prefix-beam-search-explained-c11d1ee23306 # noqa E501
-
 def beam_search(
     ctc, alphabet,
     beam_width=2,
@@ -231,6 +229,9 @@ def beam_search(
         alphabet: alphabet
         beam_width - width used in beam search
         lm: language model
+
+        This function implements Prefix Beam Search algorithm you can read
+        about it at https://medium.com/corti-ai/ctc-networks-and-language-models-prefix-beam-search-explained-c11d1ee23306 # noqa E501
     '''
     lm = (lambda l: 1) if lm is None else lm
 
@@ -254,11 +255,11 @@ def beam_search(
             print(f't: {t}')
             print(f'A_prev: {A_prev}')
             print(f'ctc: {ctc[t]}')
-        for l in A_prev:
+        for prefix in A_prev:
             # Do not extend already ended prefixes
-            if len(l) > 0 and l[-1] == '>':
-                Pb[t][l] = Pb[t - 1][l]
-                Pnb[t][l] = Pnb[t - 1][l]
+            if len(prefix) > 0 and prefix[-1] == '>':
+                Pb[t][prefix] = Pb[t - 1][prefix]
+                Pnb[t][prefix] = Pnb[t - 1][prefix]
                 continue
 
             for c in alphabet:
@@ -266,36 +267,36 @@ def beam_search(
 
                 # Extend with 'blank' - '-'
                 if c == '-':
-                    Pb[t][l] += ctc[t][0] * (Pb[t - 1][l] + Pnb[t - 1][l])
+                    Pb[t][prefix] += ctc[t][0] * (Pb[t - 1][prefix]
+                                                  + Pnb[t - 1][prefix])
                     continue
-
                 # Extended prefix
-                l_plus = ''.join([l, c])
+                prefix_plus = ''.join([prefix, c])
                 # Extend with the last character presented in l - l[-1]
-                if len(l) > 0 and c == l[-1]:
+                if len(prefix) > 0 and c == prefix[-1]:
                     # Only use Pb to put 2 repeating characters
-                    Pnb[t][l_plus] += ctc[t][c_ix] * Pb[t - 1][l]
+                    Pnb[t][prefix_plus] += ctc[t][c_ix] * Pb[t - 1][prefix]
                     # Only use Pnb to collapse 2 repeating characters
-                    Pnb[t][l] += ctc[t][c_ix] * Pnb[t - 1][l]
+                    Pnb[t][prefix] += ctc[t][c_ix] * Pnb[t - 1][prefix]
                 # Extend with a new character
                 else:
-                    lm_prob = lm(l, c) ** alpha
+                    lm_prob = lm(prefix, c) ** alpha
                     if c == '>':
-                        lm_prob = lm(l, '-') ** alpha
+                        lm_prob = lm(prefix, '-') ** alpha
                     if verbose:
-                        if len(l) == 8:
-                            print(f'lp_prob: {l} {c}: {lm(l, c)} {lm_prob}')
-                            print(f'Pnb[{t}][{l_plus}] {Pnb[t][l_plus]}')
+                        if len(prefix) == 8:
+                            print(f'lp_prob: {prefix} {c}: {lm(prefix, c)} {lm_prob}') # noqa E501
+                            print(f'Pnb[{t}][{prefix_plus}] {Pnb[t][prefix_plus]}') # noqa E501
                             print(f'ctc[{t}][{c_ix}] {ctc[t][c_ix]}')
-                    Pnb[t][l_plus] += lm_prob * ctc[t][c_ix] * (Pb[t - 1][l] + Pnb[t - 1][l])
+                    Pnb[t][prefix_plus] += lm_prob * ctc[t][c_ix] * (Pb[t - 1][prefix] + Pnb[t - 1][prefix]) # noqa E501
                     if verbose:
-                        if len(l) == 8:
-                            print(f'Pnb[{t}][{l_plus}] {Pnb[t][l_plus]}')
+                        if len(prefix) == 8:
+                            print(f'Pnb[{t}][{prefix_plus}] {Pnb[t][prefix_plus]}') # noqa E501
 
                 # Use discarded prefixes
-                if l_plus not in A_prev:
-                    Pb[t][l_plus] += ctc[t][-1] * (Pb[t - 1][l_plus] + Pnb[t - 1][l_plus])
-                    Pnb[t][l_plus] += ctc[t][c_ix] * Pnb[t - 1][l_plus]
+                if prefix_plus not in A_prev:
+                    Pb[t][prefix_plus] += ctc[t][-1] * (Pb[t - 1][prefix_plus] + Pnb[t - 1][prefix_plus]) # noqa E501
+                    Pnb[t][prefix_plus] += ctc[t][c_ix] * Pnb[t - 1][prefix_plus] # noqa E501
         A_next = Pb[t] + Pnb[t]
         A_prev = sorted(A_next,
                         key=lambda l: A_next[l] * (len(l) + 1) ** beta,
